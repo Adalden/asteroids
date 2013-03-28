@@ -3,7 +3,7 @@
     "metadata" :
     {
         "formatVersion" : 3.1,
-        "sourceFile"    : "asteroid.obj",
+        "sourceFile"    : "asteroid5.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 98,
         "faces"         : 96,

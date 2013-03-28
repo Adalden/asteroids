@@ -40,7 +40,7 @@ function initialize() {
   // attach the render-supplied DOM element
   $container.append(renderer.domElement);
 
-  addModel('models/asteroid.js', 'models/asteroid.mtl');
+  addModel('models/asteroid.js', 'models/asteroid.jpg');
 
   // create a point light
   var pointLight = new THREE.PointLight(0xFFFFFF);
@@ -55,13 +55,12 @@ function initialize() {
 }
 
 function addModel(_model, meshTexture) {
-  // var material = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(meshTexture) });
+  var material = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(meshTexture) });
   var loader = new THREE.JSONLoader(false);
-  loader.load(_model, function (geometry, material) {
-    // material.morphTargets = true;
+  loader.load(_model, function (geometry, materials) {
+    // materials[0].morphTargets = true;
     // material.shading = THREE.FlatShading;
-    console.log(material);
-    mesh = new THREE.Mesh(geometry, material[0]);
+    mesh = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
     mesh.position.x = mesh.position.y = mesh.position.z = 0;
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
     mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 40;
