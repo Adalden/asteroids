@@ -12,7 +12,7 @@ server:
 	@$(SUPERVISOR) -q -w controllers,middlewares,app.js app
 
 browserify:
-	@$(SUPERVISOR) -q -e 'js|jade' -w views/public,client/requires,client/main.js bin/browserify
+	@$(SUPERVISOR) -q -e 'js|jade' -w views/public,client bin/browserify
 
 styl:
 	@$(SUPERVISOR) -q -e 'styl' -w 'public/styl' bin/styl
