@@ -1,0 +1,13 @@
+# Blender MTL File: 'asteroid5.blend'
+# Material Count: 1
+
+newmtl Material.001
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd C:/Users/Christopher/Downloads/blender-2.49b-win64-python26/space rock tex 3.jpg
+map_Bump C:/Users/Christopher/Downloads/blender-2.49b-win64-python26/space rock tex 3.jpg
