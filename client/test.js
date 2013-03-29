@@ -69,6 +69,8 @@ function addModel(_model, meshTexture, cb) {
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
     mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 20;
 
+    mesh.geometry.boundingSphere.radius -= .2;
+
     while (collidesTEST(mesh)) {
       mesh.position.x = Math.random() * 420 - 210;
       mesh.position.y = Math.random() * 180 - 90;
