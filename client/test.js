@@ -3,6 +3,8 @@ var renderer
   , scene
   , meshes = [];
 
+var DEBUG = true;
+
 exports.init = initialize;
 exports.start = animate;
 
@@ -66,6 +68,11 @@ function addModel(_model, meshTexture, cb) {
     mesh.position.y = Math.random() * 180 - 90;
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
     mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 20;
+
+    while (collidesTEST(mesh)) {
+      mesh.position.x = Math.random() * 420 - 210;
+      mesh.position.y = Math.random() * 180 - 90;
+    }
     mesh.matrixAutoUpdate = false;
     mesh.updateMatrix();
     scene.add(mesh);
@@ -74,17 +81,39 @@ function addModel(_model, meshTexture, cb) {
   });
 }
 
-function addBoundingSphere(mesh) {
-  return;
+function collidesTEST(mesh) {
+  var m2 = mesh.position;
+  var dist2 = mesh.geometry.boundingSphere.radius * mesh.scale.x;
 
-  var radius   = 50
+  for (var i = 0; i < meshes.length; ++i) {
+
+    var m1 = meshes[i].mesh.position;
+    var d = Math.sqrt(Math.pow(m1.x - m2.x, 2) + Math.pow(m1.y - m2.y, 2) + Math.pow(m1.z - m2.z, 2));
+
+    var dist = dist2 + meshes[i].mesh.geometry.boundingSphere.radius * meshes[i].mesh.scale.x;
+    if (d <= dist) {
+    // if (d <= 40) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function addBoundingSphere(mesh) {
+  if (!DEBUG) return;
+
+  var radius   = mesh.geometry.boundingSphere.radius
     , segments = 16
     , rings    = 16;
 
   var sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(radius, segments, rings),
-    new THREE.MeshLambertMaterial({ color: 0xCC0000 })
+    new THREE.SphereGeometry(radius, segments, rings)
+    // new THREE.MeshLambertMaterial({ color: 0xCC0000 })
   );
+
+  sphere.scale = mesh.scale;
+  sphere.position = mesh.position;
 
   scene.add(sphere);
 }
@@ -151,7 +180,7 @@ function render() {
 
 function checkCollisions(j) {
   var m2 = meshes[j].mesh.position;
-  // var dist2 = meshes[j].mesh.geometry.boundingSphere.radius * meshes[j].mesh.scale.x;
+  var dist2 = meshes[j].mesh.geometry.boundingSphere.radius * meshes[j].mesh.scale.x;
 
   for (var i = 0; i < meshes.length; ++i) {
     if (i === j) continue;
@@ -159,12 +188,12 @@ function checkCollisions(j) {
     var m1 = meshes[i].mesh.position;
     var d = Math.sqrt(Math.pow(m1.x - m2.x, 2) + Math.pow(m1.y - m2.y, 2) + Math.pow(m1.z - m2.z, 2));
 
-    // var dist = dist2 + meshes[i].mesh.geometry.boundingSphere.radius * meshes[i].mesh.scale.x;
+    var dist = dist2 + meshes[i].mesh.geometry.boundingSphere.radius * meshes[i].mesh.scale.x;
     // if (j == 0)
     //   console.log(d, dist);
 
-    // if (d <= dist) {
-    if (d <= 40) {
+    if (d <= dist) {
+    // if (d <= 40) {
       var tempX = meshes[i].dx;
       var tempY = meshes[i].dy;
 
