@@ -40,8 +40,9 @@ function initialize() {
   // attach the render-supplied DOM element
   $container.append(renderer.domElement);
 
-  for (var i = 0; i < 8; ++i)
-    addModel('models/asteroid.js', 'models/asteroid.jpg');
+  for (var i = 0; i < 8; ++i) {
+    addModel('models/asteroid.js', 'models/asteroid.jpg', addBoundingSphere);
+  }
 
   // create a point light
   var pointLight = new THREE.PointLight(0xFFFFFF);
@@ -55,12 +56,10 @@ function initialize() {
   scene.add(pointLight);
 }
 
-function addModel(_model, meshTexture) {
+function addModel(_model, meshTexture, cb) {
   var material = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(meshTexture) });
   var loader = new THREE.JSONLoader(false);
   loader.load(_model, function (geometry, materials) {
-    // materials[0].morphTargets = true;
-    // material.shading = THREE.FlatShading;
     var mesh = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
     mesh.position.z = 0;
     mesh.position.x = Math.random() * 420 - 210;
@@ -71,7 +70,23 @@ function addModel(_model, meshTexture) {
     mesh.updateMatrix();
     scene.add(mesh);
     meshes.push(createAsteroid(mesh));
+    cb(mesh);
   });
+}
+
+function addBoundingSphere(mesh) {
+  return;
+
+  var radius   = 50
+    , segments = 16
+    , rings    = 16;
+
+  var sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(radius, segments, rings),
+    new THREE.MeshLambertMaterial({ color: 0xCC0000 })
+  );
+
+  scene.add(sphere);
 }
 
 function createAsteroid(mesh) {

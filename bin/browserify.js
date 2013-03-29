@@ -24,7 +24,7 @@ function create(cb, timeout) {
     })
     .require(require.resolve('../client/main.js'), { entry: true })
     .bundle({ debug: true })
-    .pipe(fs.createWriteStream(__dirname + '/../public/js/test.js'));
+    .pipe(fs.createWriteStream(__dirname + '/../public/js/app.js'));
 
   function finished() {
     log('browserify success!!');
