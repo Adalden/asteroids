@@ -8,8 +8,8 @@ exports.start = animate;
 
 function initialize() {
   // set the scene size
-  var WIDTH  = 800
-    , HEIGHT = 800;
+  var WIDTH  = 1440
+    , HEIGHT = 700;
 
   // set some camera attributes
   var VIEW_ANGLE = 45
@@ -40,7 +40,7 @@ function initialize() {
   // attach the render-supplied DOM element
   $container.append(renderer.domElement);
 
-  for (var i = 0; i < 5; ++i)
+  for (var i = 0; i < 8; ++i)
     addModel('models/asteroid.js', 'models/asteroid.jpg');
 
   // create a point light
@@ -63,7 +63,7 @@ function addModel(_model, meshTexture) {
     // material.shading = THREE.FlatShading;
     var mesh = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
     mesh.position.z = 0;
-    mesh.position.x = Math.random() * 180 - 90;
+    mesh.position.x = Math.random() * 420 - 210;
     mesh.position.y = Math.random() * 180 - 90;
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
     mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 20;
@@ -86,23 +86,30 @@ function createAsteroid(mesh) {
 
 function animate() {
   requestAnimationFrame(animate);
+  update();
   render();
 }
 
-function render() {
+function update() {
   for (var i = 0; i < meshes.length; ++i) {
     var a = meshes[i];
+    var oldPos = a.mesh.position;
 
     a.mesh.position.x += a.dx;
     a.mesh.position.y += a.dy;
 
-    if (a.mesh.position.x > 100) {
-      a.mesh.position.x = 100;
+    if (checkCollisions(i)) {
+      a.mesh.position.x = oldPos.x;
+      a.mesh.position.y = oldPos.y;
+    }
+
+    if (a.mesh.position.x > 225) {
+      a.mesh.position.x = 225;
       a.dx *= -1;
     }
 
-    if (a.mesh.position.x < -100) {
-      a.mesh.position.x = -100;
+    if (a.mesh.position.x < -225) {
+      a.mesh.position.x = -225;
       a.dx *= -1;
     }
 
@@ -121,6 +128,30 @@ function render() {
 
     a.mesh.updateMatrix();
   }
+}
 
+function render() {
   renderer.render(scene, camera);
+}
+
+function checkCollisions(j) {
+  var m2 = meshes[j].mesh.position;
+
+  for (var i = 0; i < meshes.length; ++i) {
+    if (i === j) continue;
+
+    var m1 = meshes[i].mesh.position;
+    var d = Math.sqrt(Math.pow(m1.x - m2.x, 2) + Math.pow(m1.y - m2.y, 2) + Math.pow(m1.z - m2.z, 2));
+
+    if (j == 0)
+      console.log(d);
+
+    if (d <= 40) {
+      meshes[j].dx *= -1;
+      meshes[j].dy *= -1;
+      return true;
+    }
+  }
+
+  return false;
 }

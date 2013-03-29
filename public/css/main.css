@@ -2,6 +2,13 @@
   padding: 0;
   margin: 0;
 }
-canvas {
+body {
+  width: 100%;
+}
+body #test {
+  width: 100%;
+}
+body #test canvas {
+  width: 100%;
   background-color: #000;
 }

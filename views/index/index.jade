@@ -2,10 +2,3 @@ extends ../layout
 
 block content
   #test
-
-append scripts
-  script
-    $(function () {
-      var render = require('/client/requires/render');
-      $(".lists").append(render('list-test', { title: 'hi', items: [] }));
-    });
