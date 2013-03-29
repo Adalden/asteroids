@@ -432,59 +432,6 @@ process.binding = function (name) {
 
 });
 
-require.define("list-test.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<div class="list">');
-if ( title)
-{
-buf.push('<div class="title">');
-var __val__ = title
-buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</div>');
-}
-if ( items)
-{
-// iterate items
-;(function(){
-  if ('number' == typeof items.length) {
-
-    for (var $index = 0, $$l = items.length; $index < $$l; $index++) {
-      var item = items[$index];
-
-buf.push('<div class="item"><a');
-buf.push(attrs({ 'href':(item.href) }, {"href":true}));
-buf.push('>');
-var __val__ = item.name
-buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</a></div>');
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in items) {
-      $$l++;      var item = items[$index];
-
-buf.push('<div class="item"><a');
-buf.push(attrs({ 'href':(item.href) }, {"href":true}));
-buf.push('>');
-var __val__ = item.name
-buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</a></div>');
-    }
-
-  }
-}).call(this);
-
-}
-buf.push('</div>');
-}
-return buf.join("");
-}
-});
-
 require.define("/client/requires/render.js",function(require,module,exports,__dirname,__filename,process,global){var render = require('browserijade');
 
 module.exports = function (view, locals) {
@@ -840,6 +787,7 @@ function render() {
 
 function checkCollisions(j) {
   var m2 = meshes[j].mesh.position;
+  // var dist2 = meshes[j].mesh.geometry.boundingSphere.radius * meshes[j].mesh.scale.x;
 
   for (var i = 0; i < meshes.length; ++i) {
     if (i === j) continue;
@@ -847,12 +795,21 @@ function checkCollisions(j) {
     var m1 = meshes[i].mesh.position;
     var d = Math.sqrt(Math.pow(m1.x - m2.x, 2) + Math.pow(m1.y - m2.y, 2) + Math.pow(m1.z - m2.z, 2));
 
-    if (j == 0)
-      console.log(d);
+    // var dist = dist2 + meshes[i].mesh.geometry.boundingSphere.radius * meshes[i].mesh.scale.x;
+    // if (j == 0)
+    //   console.log(d, dist);
 
+    // if (d <= dist) {
     if (d <= 40) {
-      meshes[j].dx *= -1;
-      meshes[j].dy *= -1;
+      var tempX = meshes[i].dx;
+      var tempY = meshes[i].dy;
+
+      meshes[i].dx = meshes[j].dx;
+      meshes[i].dy = meshes[j].dy;
+
+      meshes[j].dx = tempX;
+      meshes[j].dy = tempY;
+
       return true;
     }
   }

@@ -136,6 +136,7 @@ function render() {
 
 function checkCollisions(j) {
   var m2 = meshes[j].mesh.position;
+  // var dist2 = meshes[j].mesh.geometry.boundingSphere.radius * meshes[j].mesh.scale.x;
 
   for (var i = 0; i < meshes.length; ++i) {
     if (i === j) continue;
@@ -143,12 +144,21 @@ function checkCollisions(j) {
     var m1 = meshes[i].mesh.position;
     var d = Math.sqrt(Math.pow(m1.x - m2.x, 2) + Math.pow(m1.y - m2.y, 2) + Math.pow(m1.z - m2.z, 2));
 
-    if (j == 0)
-      console.log(d);
+    // var dist = dist2 + meshes[i].mesh.geometry.boundingSphere.radius * meshes[i].mesh.scale.x;
+    // if (j == 0)
+    //   console.log(d, dist);
 
+    // if (d <= dist) {
     if (d <= 40) {
-      meshes[j].dx *= -1;
-      meshes[j].dy *= -1;
+      var tempX = meshes[i].dx;
+      var tempY = meshes[i].dy;
+
+      meshes[i].dx = meshes[j].dx;
+      meshes[i].dy = meshes[j].dy;
+
+      meshes[j].dx = tempX;
+      meshes[j].dy = tempY;
+
       return true;
     }
   }

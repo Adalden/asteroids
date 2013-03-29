@@ -1,59 +1,35 @@
-var browserify   = require('browserify')
-  , browserijade = require('browserijade')
-  , fs           = require('fs')
-  , sleep        = require('sleep')
-  , config       = require('../config')
-  ;
+var browserify = require('browserify')
+  , fs         = require('fs');
 
 function log() {
   var args = Array.prototype.slice.call(arguments);
   args.unshift("\033[0;36m" + "browserify:", "\033[m");
   console.log.apply(console, args);
-};
+}
 
-var bundle = browserify({
-  watch: false,
-  cache: false,
-  debug: false
-});
+function create(cb, timeout) {
+  log('browserify starting');
 
-bundle.on('syntaxError', function (err) {
-  console.error(err && err.stack || String(err));
-  process.exit(1);
-});
+  timeout = timeout || 300;
+  cb = cb || function () {};
+  var t = setTimeout(finished, timeout);
 
-log('loading jade views');
-bundle.use(browserijade(__dirname + "/../" + config.browserify.jade));
+  browserify()
+    .on('error', function (err) {
+      clearTimeout(t);
+      log('ERROR');
+      console.log(err.annotated + '\n');
+      log('browserify failed!!');
+      process.exit();
+    })
+    .require(require.resolve('../client/main.js'), { entry: true })
+    .bundle({ debug: true })
+    .pipe(fs.createWriteStream(__dirname + '/../public/js/test.js'));
 
-log('running requires');
-function addFiles(folder) {
-  var files = fs.readdirSync(folder);
-  for (var i = 0; i < files.length; ++i) {
-    var req = folder + "/" + files[i];
-    var stats = fs.statSync(req);
-    if (stats.isDirectory()) {
-      addFiles(req);
-    } else {
-      if (files[i].indexOf('.js') !== -1) {
-        log('requiring ' + req);
-        bundle.require(req);
-      }
-    }
+  function finished() {
+    log('browserify success!!');
+    cb();
   }
-};
-addFiles(config.browserify.requires);
+}
 
-var entry = config.browserify.entry;
-log('adding entry: ' + entry);
-bundle.addEntry(entry);
-
-function write() {
-  var src = bundle.bundle();
-  var outfile = config.browserify.output;
-  log('writing ' + outfile);
-  fs.writeFileSync(outfile, src);
-};
-
-write();
-
-sleep.sleep(10000000);
+exports.create = create;
