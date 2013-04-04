@@ -1,7 +1,33 @@
 var renderer
   , camera
   , scene
+  , ship
   , meshes = [];
+
+$(document).keydown(function (e) {
+  if (!ship) return;
+
+  if (e.keyCode === 37) {
+    ship.rotation.y += Math.PI / 180 * 5;
+    ship.updateMatrix();
+  }
+
+  if(e.keyCode == 39){
+    ship.rotation.y -= Math.PI / 180 * 5;
+    ship.updateMatrix();
+  }
+
+  if(e.keyCode == 38){
+    ship.position.y -= Math.cos(ship.rotation.y) * 5;
+    ship.position.x += Math.sin(ship.rotation.y) * 5;
+    ship.updateMatrix();
+  }
+
+  if(e.keyCode == 40){
+    ship.position.y -= 5;
+    ship.updateMatrix();
+  }
+});
 
 var DEBUG = true;
 
@@ -46,6 +72,8 @@ function initialize() {
     addModel('models/asteroid.js', 'models/asteroid.jpg', addBoundingSphere);
   }
 
+  addShip('models/ship.js');
+
   // create a point light
   var pointLight = new THREE.PointLight(0xFFFFFF);
 
@@ -59,7 +87,10 @@ function initialize() {
 }
 
 function addModel(_model, meshTexture, cb) {
-  var material = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(meshTexture) });
+  cb = cb || function () {};
+  var material = undefined;
+  if (meshTexture)
+    material = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(meshTexture) });
   var loader = new THREE.JSONLoader(false);
   loader.load(_model, function (geometry, materials) {
     var mesh = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
@@ -81,6 +112,25 @@ function addModel(_model, meshTexture, cb) {
     meshes.push(createAsteroid(mesh));
     cb(mesh);
   });
+}
+
+function addShip(_model){
+  var loader = new THREE.JSONLoader(false);
+  loader.load(_model, function (geometry, materials) {
+    var mesh = new THREE.Mesh(geometry, materials[0]); // new THREE.MeshFaceMaterial(materials)
+    mesh.position.x = mesh.position.y = mesh.position.z = 0;
+    mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
+    mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = .1;
+
+    mesh.rotation.x = 90;
+
+    mesh.matrixAutoUpdate = false;
+    mesh.updateMatrix();
+    scene.add(mesh);
+    ship = mesh;
+  });
+
+
 }
 
 function collidesTEST(mesh) {
