@@ -52,15 +52,12 @@ function initialize() {
   // create a WebGL renderer, camera
   // and a scene
   renderer = new THREE.WebGLRenderer();
-  camera   = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+//  camera   = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+  camera   = new THREE.OrthographicCamera(WIDTH / 2, -WIDTH / 2, HEIGHT / 2, -HEIGHT / 2, HEIGHT / 2, NEAR, FAR);
   scene    = new THREE.Scene();
 
   // add the camera to the scene
   scene.add(camera);
-
-  // the camera starts at 0,0,0
-  // so pull it back
-  camera.position.z = 300;
 
   // start the renderer
   renderer.setSize(WIDTH, HEIGHT);
@@ -95,16 +92,16 @@ function addModel(_model, meshTexture, cb) {
   loader.load(_model, function (geometry, materials) {
     var mesh = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
     mesh.position.z = 0;
-    mesh.position.x = Math.random() * 420 - 210;
-    mesh.position.y = Math.random() * 180 - 90;
+    mesh.position.x = (Math.random() - .5) * 1440;
+    mesh.position.y = (Math.random() - .5) * 700;
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
-    mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 20;
+    mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 60;
 
     mesh.geometry.boundingSphere.radius -= .2;
 
     while (collidesTEST(mesh)) {
-      mesh.position.x = Math.random() * 420 - 210;
-      mesh.position.y = Math.random() * 180 - 90;
+      mesh.position.x = (Math.random() - .5) * 1440;
+      mesh.position.y = (Math.random() - .5) * 700;
     }
     mesh.matrixAutoUpdate = false;
     mesh.updateMatrix();
@@ -171,11 +168,13 @@ function addBoundingSphere(mesh) {
 }
 
 function createAsteroid(mesh) {
+  var SPEED = 3;
+
   return {
     rotX: (Math.random() - .5) / 50,
     rotY: (Math.random() - .5) / 50,
-    dx: (Math.random() - .5) / 2,
-    dy: (Math.random() - .5) / 2,
+    dx: (Math.random() - .5) * SPEED,
+    dy: (Math.random() - .5) * SPEED,
     mesh: mesh
   };
 }
@@ -187,40 +186,45 @@ function animate() {
 }
 
 function update() {
+  var WIDTH  = 1440;
+  var HEIGHT = 700;
+
   for (var i = 0; i < meshes.length; ++i) {
     var a = meshes[i];
-    var oldPos = a.mesh.position;
+
+    var oldX = a.mesh.position.x;
+    var oldY = a.mesh.position.y;
 
     a.mesh.position.x += a.dx;
     a.mesh.position.y += a.dy;
 
     if (checkCollisions(i)) {
-      a.mesh.position.x = oldPos.x;
-      a.mesh.position.y = oldPos.y;
+      a.mesh.position.x = oldX;
+      a.mesh.position.y = oldY;
     }
 
-    if (a.mesh.position.x > 225) {
-      a.mesh.position.x = 225;
+    if (a.mesh.position.x > WIDTH / 2) {
+      a.mesh.position.x = WIDTH / 2;
       a.dx *= -1;
     }
 
-    if (a.mesh.position.x < -225) {
-      a.mesh.position.x = -225;
+    if (a.mesh.position.x < -WIDTH / 2) {
+      a.mesh.position.x = -WIDTH / 2;
       a.dx *= -1;
     }
 
-    if (a.mesh.position.y > 100) {
-      a.mesh.position.y = 100;
+    if (a.mesh.position.y > HEIGHT / 2) {
+      a.mesh.position.y = HEIGHT / 2;
       a.dy *= -1;
     }
 
-    if (a.mesh.position.y < -100) {
-      a.mesh.position.y = -100;
+    if (a.mesh.position.y < -HEIGHT / 2) {
+      a.mesh.position.y = -HEIGHT / 2;
       a.dy *= -1;
     }
 
-    a.mesh.rotation.z += a.rotX;
-    a.mesh.rotation.x += a.rotY;
+    a.mesh.rotation.x += a.rotX;
+    a.mesh.rotation.y += a.rotY;
 
     a.mesh.updateMatrix();
   }
