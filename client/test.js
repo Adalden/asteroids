@@ -4,32 +4,10 @@ var renderer
   , ship
   , meshes = [];
 
-$(document).keydown(function (e) {
-  if (!ship) return;
+var inp    = require('./input')
+  , player = require('./player');
 
-  if (e.keyCode === 37) {
-    ship.rotation.y += Math.PI / 180 * 5;
-    ship.updateMatrix();
-  }
-
-  if(e.keyCode == 39){
-    ship.rotation.y -= Math.PI / 180 * 5;
-    ship.updateMatrix();
-  }
-
-  if(e.keyCode == 38){
-    ship.position.y -= Math.cos(ship.rotation.y) * 5;
-    ship.position.x += Math.sin(ship.rotation.y) * 5;
-    ship.updateMatrix();
-  }
-
-  if(e.keyCode == 40){
-    ship.position.y -= 5;
-    ship.updateMatrix();
-  }
-});
-
-var DEBUG = true;
+var DEBUG = false;
 
 exports.init = initialize;
 exports.start = animate;
@@ -114,17 +92,20 @@ function addModel(_model, meshTexture, cb) {
 function addShip(_model){
   var loader = new THREE.JSONLoader(false);
   loader.load(_model, function (geometry, materials) {
-    var mesh = new THREE.Mesh(geometry, materials[0]); // new THREE.MeshFaceMaterial(materials)
+    var mesh = new THREE.Mesh(geometry); // new THREE.MeshFaceMaterial(materials)
     mesh.position.x = mesh.position.y = mesh.position.z = 0;
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
-    mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = .1;
+    mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 1;
 
+    mesh.position.z = -100;
     mesh.rotation.x = 90;
 
     mesh.matrixAutoUpdate = false;
     mesh.updateMatrix();
     scene.add(mesh);
     ship = mesh;
+
+    player.setShip(ship);
   });
 
 
@@ -181,11 +162,35 @@ function createAsteroid(mesh) {
 
 function animate() {
   requestAnimationFrame(animate);
-  update();
+  updateAsteroids();
+  updatePlayer();
   render();
 }
 
-function update() {
+function updatePlayer() {
+  if (!ship) return;
+
+  if (inp.up()) {
+    player.moveUp();
+  }
+
+  if (inp.down()) {
+    player.moveDown();
+  }
+
+  if (inp.left()) {
+    player.moveLeft();
+  }
+
+  if (inp.right()) {
+    player.moveRight();
+  }
+
+  player.update();
+  ship.updateMatrix();
+}
+
+function updateAsteroids() {
   var WIDTH  = 1440;
   var HEIGHT = 700;
 
