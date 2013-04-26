@@ -69,22 +69,31 @@ function addModel(_model, meshTexture, cb) {
   var loader = new THREE.JSONLoader(false);
   loader.load(_model, function (geometry, materials) {
     var mesh = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
+    var mesh2 = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
+    var mesh3 = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
+    var mesh4 = new THREE.Mesh(geometry, material); // new THREE.MeshFaceMaterial(materials)
     mesh.position.z = 0;
     mesh.position.x = (Math.random() - .5) * 1440;
     mesh.position.y = (Math.random() - .5) * 700;
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
     mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 60;
 
-    mesh.geometry.boundingSphere.radius -= .2;
+    mesh2.rotation = mesh3.rotation = mesh4.rotation = mesh.rotation;
+    mesh2.scale = mesh3.scale = mesh4.scale = mesh.scale;
 
-    while (collidesTEST(mesh)) {
-      mesh.position.x = (Math.random() - .5) * 1440;
-      mesh.position.y = (Math.random() - .5) * 700;
-    }
+    // mesh.geometry.boundingSphere.radius -= .2;
+
+    // while (collidesTEST(mesh)) {
+    //   mesh.position.x = (Math.random() - .5) * 1440;
+    //   mesh.position.y = (Math.random() - .5) * 700;
+    // }
     mesh.matrixAutoUpdate = false;
     mesh.updateMatrix();
     scene.add(mesh);
-    meshes.push(createAsteroid(mesh));
+    scene.add(mesh2);
+    scene.add(mesh3);
+    scene.add(mesh4);
+    meshes.push(createAsteroid(mesh, mesh2, mesh3, mesh4));
     cb(mesh);
   });
 }
@@ -93,6 +102,10 @@ function addShip(_model){
   var loader = new THREE.JSONLoader(false);
   loader.load(_model, function (geometry, materials) {
     var mesh = new THREE.Mesh(geometry); // new THREE.MeshFaceMaterial(materials)
+    var mesh2 = new THREE.Mesh(geometry); // new THREE.MeshFaceMaterial(materials)
+    var mesh3 = new THREE.Mesh(geometry); // new THREE.MeshFaceMaterial(materials)
+    var mesh4 = new THREE.Mesh(geometry); // new THREE.MeshFaceMaterial(materials)
+    
     mesh.position.x = mesh.position.y = mesh.position.z = 0;
     mesh.rotation.x = mesh.rotation.y = mesh.rotation.z = 0;
     mesh.scale.x    = mesh.scale.y    = mesh.scale.z    = 1;
@@ -100,12 +113,18 @@ function addShip(_model){
     mesh.position.z = -100;
     mesh.rotation.x = 90;
 
+    mesh2.rotation = mesh3.rotation = mesh4.rotation = mesh.rotation;
+    mesh2.scale = mesh3.scale = mesh4.scale = mesh.scale;
+
     mesh.matrixAutoUpdate = false;
     mesh.updateMatrix();
     scene.add(mesh);
+    scene.add(mesh2);
+    scene.add(mesh3);
+    scene.add(mesh4);
     ship = mesh;
 
-    player.setShip(ship);
+    player.setShip(ship, mesh2, mesh3, mesh4);
   });
 
 
@@ -148,7 +167,7 @@ function addBoundingSphere(mesh) {
   scene.add(sphere);
 }
 
-function createAsteroid(mesh) {
+function createAsteroid(mesh, mesh2, mesh3, mesh4) {
   var SPEED = 3;
 
   return {
@@ -156,7 +175,10 @@ function createAsteroid(mesh) {
     rotY: (Math.random() - .5) / 50,
     dx: (Math.random() - .5) * SPEED,
     dy: (Math.random() - .5) * SPEED,
-    mesh: mesh
+    mesh: mesh,
+    mesh2: mesh2,
+    mesh3: mesh3,
+    mesh4: mesh4
   };
 }
 
@@ -203,30 +225,66 @@ function updateAsteroids() {
     a.mesh.position.x += a.dx;
     a.mesh.position.y += a.dy;
 
-    if (checkCollisions(i)) {
-      a.mesh.position.x = oldX;
-      a.mesh.position.y = oldY;
-    }
+    // if (checkCollisions(i)) {
+    //   a.mesh.position.x = oldX;
+    //   a.mesh.position.y = oldY;
+    // }
 
     if (a.mesh.position.x > WIDTH / 2) {
-      a.mesh.position.x = WIDTH / 2;
-      a.dx *= -1;
+      a.mesh.position.x -= WIDTH;
+      // a.mesh.position.x = WIDTH / 2;
+      // a.dx *= -1;
     }
 
     if (a.mesh.position.x < -WIDTH / 2) {
-      a.mesh.position.x = -WIDTH / 2;
-      a.dx *= -1;
+      a.mesh.position.x += WIDTH;
+      // a.mesh.position.x = -WIDTH / 2;
+      // a.dx *= -1;
     }
 
     if (a.mesh.position.y > HEIGHT / 2) {
-      a.mesh.position.y = HEIGHT / 2;
-      a.dy *= -1;
+      a.mesh.position.y -= HEIGHT;
+      // a.mesh.position.y = HEIGHT / 2;
+      // a.dy *= -1;
     }
 
     if (a.mesh.position.y < -HEIGHT / 2) {
-      a.mesh.position.y = -HEIGHT / 2;
-      a.dy *= -1;
+      a.mesh.position.y += HEIGHT;
+      // a.mesh.position.y = -HEIGHT / 2;
+      // a.dy *= -1;
     }
+
+
+    a.mesh2.position.y = a.mesh.position.y;
+    a.mesh2.position.z = a.mesh.position.z;
+
+    if (a.mesh.position.x > 0)
+      a.mesh2.position.x = a.mesh.position.x - WIDTH;
+    else
+      a.mesh2.position.x = a.mesh.position.x + WIDTH;
+
+    a.mesh3.position.x = a.mesh.position.x;
+    a.mesh3.position.z = a.mesh.position.z;
+
+    if (a.mesh.position.y > 0)
+      a.mesh3.position.y = a.mesh.position.y - HEIGHT;
+    else
+      a.mesh3.position.y = a.mesh.position.y + HEIGHT;
+
+
+    a.mesh4.position.z = a.mesh.position.z;
+
+
+    if (a.mesh.position.x > 0)
+      a.mesh4.position.x = a.mesh.position.x - WIDTH;
+    else
+      a.mesh4.position.x = a.mesh.position.x + WIDTH;
+    if (a.mesh.position.y > 0)
+      a.mesh4.position.y = a.mesh.position.y - HEIGHT;
+    else
+      a.mesh4.position.y = a.mesh.position.y + HEIGHT;
+
+
 
     a.mesh.rotation.x += a.rotX;
     a.mesh.rotation.y += a.rotY;
